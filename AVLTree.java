@@ -156,16 +156,23 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  the node of the tree with the desired key value
      */
     private AVLTreeNode<T> search(AVLTreeNode<T> x, T key) {
+        // do nothing if the key is null
         if (x == null)
             return x;
 
+        // use the comparable implementation of the key to find whether it is in the left or right subtree
         int cmp = key.compareTo(x.key);
-        if (cmp < 0)
+
+        if (cmp < 0) {
+            // left subtree
             return search(x.left, key);
-        else if (cmp > 0)
+        } else if (cmp > 0) {
+            // right subtree
             return search(x.right, key);
-        else
+        } else {
+            // equals the node
             return x;
+        }
     }
 
     /**
@@ -184,15 +191,21 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  the node of the tree with the desired key value
      */
     private AVLTreeNode<T> iterativeSearch(AVLTreeNode<T> x, T key) {
+        // do nothing if the key is null
         while (x != null) {
+            // use the comparable implementation of the key to find whether it is in the left or right subtree
             int cmp = key.compareTo(x.key);
 
-            if (cmp < 0)
+            if (cmp < 0) {
+                // left subtree
                 x = x.left;
-            else if (cmp > 0)
+            } else if (cmp > 0) {
+                // right subtree
                 x = x.right;
-            else
+            } else {
+                // equals the node
                 return x;
+            }
         }
 
         return x;
@@ -215,7 +228,9 @@ public class AVLTree<T extends Comparable<T>> {
      */
     private AVLTreeNode<T> minimum(AVLTreeNode<T> tree) {
 
+        // do nothing if the tree is null
         if (tree != null) {
+            // find the smallest node in the left subtree
             while (tree.left != null)
                 tree = tree.left;
         }
@@ -228,7 +243,10 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  the smallest node of the AVL tree
      */ 
     public T minimum() {
+        // find the minimum of the entire AVL tree
         AVLTreeNode<T> p = minimum(mRoot);
+
+        // do nothing if the root of the tree is null
         if (p != null)
             return p.key;
 
@@ -243,7 +261,9 @@ public class AVLTree<T extends Comparable<T>> {
      */
     private AVLTreeNode<T> maximum(AVLTreeNode<T> tree) {
         
+        // do nothing if the tree is null
         if (tree != null) {
+            // find the largest node in the right subtree
             while (tree.right != null)
                 tree = tree.right;
         }
@@ -256,7 +276,10 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  the largest node in the AVLTree
      */
     public T maximum() {
+        // find the maximum of the entire AVL tree
         AVLTreeNode<T> p = maximum(mRoot);
+
+        // do nothing if the root of the tree is null
         if (p != null)
             return p.key;
 
@@ -269,15 +292,12 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  the root node after rotation
      */
     private AVLTreeNode<T> leftLeftRotation(AVLTreeNode<T> k2) {
+        // perform the rotation
         AVLTreeNode<T> k1 = k2.right;
-
         k2.right = k1.left;
         k1.left = k2;
 
-        // k1 = k2.left;
-        // k2.left = k1.right;
-        // k1.right = k2;
-
+        // readjust the heights
         k2.height = max(height(k2.left), height(k2.right)) + 1;
         k1.height = max(height(k1.left), height(k1.right)) + 1;
 
@@ -290,14 +310,12 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  the root node after rotation
      */
     private AVLTreeNode<T> rightRightRotation(AVLTreeNode<T> k1) {
+        // perform the rotations
         AVLTreeNode<T> k2 = k1.left;
-
         k1.left = k2.right;
         k2.right = k1;
-        // k2 = k1.right;
-        // k1.right = k2.left;
-        // k2.left = k1;
 
+        // readjust the heights
         k1.height = max(height(k1.left), height(k1.right)) + 1;
         k2.height = max(height(k2.right), height(k2.left)) + 1;
 
@@ -310,8 +328,10 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  the root node after rotation
      */
     private AVLTreeNode<T> leftRightRotation(AVLTreeNode<T> k3) {
+        // first perform a LL rotation
         k3.left = leftLeftRotation(k3.left);
 
+        // perform a RR rotation after the initial
         return rightRightRotation(k3);
     }
 
@@ -321,8 +341,10 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  the root node after rotation
      */
     private AVLTreeNode<T> rightLeftRotation(AVLTreeNode<T> k1) {
+        // first perform a RR rotation
         k1.right = rightRightRotation(k1.right);
 
+        // perform a LL rotation after the initial
         return leftLeftRotation(k1);
     }
 
@@ -332,31 +354,12 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  the balance factor of the node
      */
     private int balance(AVLTreeNode<T> node) {
+        // do nothing if the node is null
         if (node == null)
             return 0;
 
+        // return the height of the entire tree from the node given
         return height(node.left) - height(node.right);
-    }
-
-    /**
-     * Balances the tree
-     * @param tree  the root of the tree which should be rotated and checked for balance
-     * @param key  the key of the node that was just inserted/deleted
-     */
-    private void balanceTree(AVLTreeNode<T> tree, T key) {
-        if (balance(tree) > 1) {
-            if (key.compareTo(tree.left.key) < 0)
-                tree = rightRightRotation(tree);
-            else
-                tree = leftRightRotation(tree);
-        }
-    
-        if (balance(tree) < -1) {
-            if (key.compareTo(tree.right.key) > 0)
-                tree = leftLeftRotation(tree);
-            else
-                tree = rightLeftRotation(tree);
-        }
     }
 
     /**
@@ -367,28 +370,45 @@ public class AVLTree<T extends Comparable<T>> {
      * @return  tree root node
      */
     private AVLTreeNode<T> insert(AVLTreeNode<T> tree, T key) {
+        // run if there is no node at the point
         if (tree == null) {
+            // create a new node at the current position
             tree = new AVLTreeNode<T>(key, null, null);
-            if (tree == null) {
-                System.out.println("ERROR: Create AVLTreeNode failed!");
-                return null;
-            }
         } else {
+            // use the comparable implementation of the key to find whether it is in the left or right subtree
             int cmp = key.compareTo(tree.key);
 
-            if (cmp < 0) { // Case: The key should be inserted into the "left subtree of the tree"
+            if (cmp < 0) { 
+                // the key should be inserted into the "left subtree of the tree"
                 tree.left = insert(tree.left, key);
 
-            } else if (cmp > 0) { // Case: The key should be inserted into the "right subtree of the tree"
+            } else if (cmp > 0) { 
+                // the key should be inserted into the "right subtree of the tree"
                 tree.right = insert(tree.right, key);
             
-            } else { // cmp==0
+            } else { 
+                // do nothing if the key is already in the tree
                 System.out.println("Insert Fail: Cannot insert the same element!");
+
             }
         }
         
-        balanceTree(tree, key);
+        // rebalance the tree if it is heavier on the left or right side
+        if (balance(tree) > 1) {
+            // perform the correct rotation depending on where the node is in the tree
+            if (key.compareTo(tree.left.key) < 0)
+                tree = rightRightRotation(tree);
+            else
+                tree = leftRightRotation(tree);
+        } else if (balance(tree) < -1) {
+            // perform the correct rotation depending on where the node is in the tree
+            if (key.compareTo(tree.right.key) > 0)
+                tree = leftLeftRotation(tree);
+            else
+                tree = rightLeftRotation(tree);
+        }
 
+        // readjust the height of the tree after insertion of a node
         tree.height = max(height(tree.left), height(tree.right)) + 1;
         
         return tree;
@@ -414,28 +434,32 @@ public class AVLTree<T extends Comparable<T>> {
         if (tree == null || z == null)
             return null;
 
+        // use the comparable implementation of the key to find whether it is in the left or right subtree
         int cmp = z.key.compareTo(tree.key);
-        if (cmp < 0) { // The node to be deleted is in the "left subtree of tree"
-
+        if (cmp < 0) { 
+            // The node to be deleted is in the "left subtree of tree"
             tree.left = remove(tree.left, z);
 
-        } else if (cmp > 0) { // The node to be deleted is in the "right subtree of tree"
-
+        } else if (cmp > 0) { 
+            // The node to be deleted is in the "right subtree of tree"
             tree.right = remove(tree.right, z);
 
         } else {
             // If both the left and right children of "tree" are not empty
             if ((tree.left != null) && (tree.right != null)) {
-                if (height(tree.left) > height(tree.right)) {
-                    /*
-                     * Write your code here
-                     */
 
+                if (height(tree.left) > height(tree.right)) {
+                    // find the largest node in the left subtree to rebalance
+                    AVLTreeNode<T> max = maximum(tree.left);
+                    tree.key = max.key;
+                    tree.left = remove(tree.left, max);
                 } else {
-                    /*
-                     * Write your code here
-                     */
+                    // find the smallest node in the right subtree to rebalance
+                    AVLTreeNode<T> min = minimum(tree.right);
+                    tree.key = min.key;
+                    tree.right = remove(tree.right, min);
                 }
+
             } else {
                 AVLTreeNode<T> tmp = tree;
                 tree = (tree.left != null) ? tree.left : tree.right;
@@ -443,14 +467,33 @@ public class AVLTree<T extends Comparable<T>> {
             }
         }
 
-        balanceTree(tree, null);
-
+        // rebalance the tree if it is heavier on the left or right side
+        if (balance(tree) > 1) {
+            // perform the correct rotation depending on where the node is in the tree
+            if (z.key.compareTo(tree.left.key) < 0)
+                tree = rightRightRotation(tree);
+            else
+                tree = leftRightRotation(tree);
+        } else if (balance(tree) < -1) {
+            // perform the correct rotation depending on where the node is in the tree
+            if (z.key.compareTo(tree.right.key) > 0)
+                tree = leftLeftRotation(tree);
+            else
+                tree = rightLeftRotation(tree);
+        }
+        
         return tree;
     }
 
+    /**
+     * Public call for the remove method
+     * @param key  the key of the element to be removed
+     */
     public void remove(T key) {
+        // create a temporary node to hold the node to be deleted
         AVLTreeNode<T> z;
 
+        // search for the node to be deleted and delete if it exists
         if ((z = search(mRoot, key)) != null)
             mRoot = remove(mRoot, z);
     }
